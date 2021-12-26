@@ -1,0 +1,98 @@
+<resources>
+    <!-- Network Section -->
+    <string name="network_multiverse_server_dns">10.0.2.2:5001</string> <!-- local pc -> 192.168.2.15:8080  pi -> 192.168.2.18:8080  adroid vm -> 10.0.2.2:8080-->
+    <string name="network_auth_login">/api/authentication/login</string>
+    <string name="network_auth_register">/api/authentication/register</string>
+    <string name="network_auth_refresh">/api/authentication/refresh</string>
+    <string name="network_user_info">/api/user/%d</string>
+    <string name="network_user_ownInfo">/api/user/user</string>
+    <string name="network_user_users">/api/user/users</string>
+    <string name="network_user_search">/api/user/search</string>
+    <string name="network_relationship_follower">/api/relationship/follower</string>
+    <string name="network_relationship_followed">/api/relationship/followed</string>
+    <string name="network_relationship_deleteFollower">/api/relationship/follower/%d</string>
+    <string name="network_relationship_deleteFollowed">/api/relationship/followed/%d</string>
+    <string name="network_relationship_followerRequest">/api/relationship/follower/request</string>
+    <string name="network_relationship_followedRequest">/api/relationship/followed/request</string>
+    <string name="network_relationship_acceptFollowedRequest">/api/relationship/follower/request/%d</string>
+    <string name="network_relationship_deleteFollowerRequest">/api/relationship/followed/request/%d</string>
+    <string name="network_relationship_sendFollowerRequest">/api/relationship/followed/request/%d</string>
+    <string name="network_relationship_deleteFollowedRequest">/api/relationship/follower/request/%d</string>
+    <string name="network_conversation_get">/api/conversation/%d</string>
+    <string name="network_conversation_set">/api/conversation/%d</string>
+    <string name="network_conversation_delete">/api/conversation/%d</string>
+    <string name="network_conversation_new">/api/conversation/new</string>
+    <string name="network_conversation_getList">/api/conversation/conversations</string>
+    <string name="network_conversation_sendMessage">/api/conversation/%d/send</string>
+    <string name="network_conversation_deleteMessage">/api/conversation/%d/%d</string>
+    <string name="network_conversation_updateMessage">/api/conversation/%d/%d</string>
+    <string name="network_conversation_messageList">/api/conversation/%d/messages</string>
+    <string name="network_conversation_addUserToConv">/api/conversation/%d/users</string>
+    <string name="network_conversation_deleteUserFromConv">/api/conversation/%d/users</string>
+    <string name="network_notification_get">/api/notification/notifications</string>
+
+    <string name="app_name">Multiverse</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- General Strings -->
+    <string name="general_firstname">First Name</string>
+    <string name="general_lastname">Last Name</string>
+    <string name="general_email">Email</string>
+    <string name="general_password">Password</string>
+    <string name="general_submit">Submit</string>
+    <string name="general_serverError">A server error occur. Try Again!</string>
+    <string name="general_device_offline">Your device is offline. Connect it online!</string>
+    <string name="general_ressource_not_accessible">The data your are trying to access is not accessible… Go back!</string>
+
+    <!-- Register Strings -->
+    <string name="register_repeat_password">Repeat the Password</string>
+    <string name="register_login">Not new? Login Here!</string>
+    <string name="register_emptyField">The field is empty!</string>
+    <string name="register_badEmail">The email is not valid!</string>
+    <string name="register_emailAlreadyExists">The email already exists!</string>
+    <string name="register_badPassword">The password do not meet the requirement!</string>
+    <string name="register_badRepeatPassword">The password is not the same in both fields!</string>
+
+    <!-- Login Strings -->
+    <string name="login_register">New? Register Here!</string>
+    <string name="login_badCredential">The credential entered are bad!</string>
+
+    <!-- Main Activity Strings -->
+    <string name="main_home">Home</string>
+    <string name="main_users">Users</string>
+    <string name="main_conversation">Conversations</string>
+
+    <!-- Users Search Strings -->
+    <string name="users_search">Users Search</string>
+
+    <!-- User -->
+    <string name="user_actionBar_title">User Profile</string>
+    <string name="user_nbrFollower">Follower</string>
+    <string name="user_nbrFollowed">Followed</string>
+    <string name="user_nbrOfRequestFollower">Request</string>
+    <string name="user_nbrOfRequestFollowed">Pending</string>
+    <string name="user_nbrOfConversation">Conversations</string>
+    <string name="user_nbrOfPost">Posts</string>
+    <string name="user_emptyDescription">Empty description...</string>
+    <string name="user_follow">Follow</string>
+    <string name="user_acceptRequest">Accept Follower</string>
+    <string name="user_deleteRequest">Delete Request</string>
+    <string name="user_sendRequest">Send Request</string>
+    <string name="user_removeFollower">Remove Follower</string>
+    <string name="user_removeFollowed">Remove Followed</string>
+    <string name="user_sendMessage">Send Message</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_authentication">AuthenticationActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+</resources>
