@@ -8,7 +8,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,11 +69,11 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
             super(itemView);
             this.mUser = user;
 
-            this.container = itemView.findViewById(R.id.entry_user_request_container);
-            this.nameTextView = itemView.findViewById(R.id.entry_user_request_name);
-            this.progressBar = itemView.findViewById(R.id.entry_user_request_loading);
-            this.acceptImageView = itemView.findViewById(R.id.entry_user_request_accept);
-            this.refuseImageView = itemView.findViewById(R.id.entry_user_request_delete);
+            this.container = itemView.findViewById(R.id.entry_community_container);
+            this.nameTextView = itemView.findViewById(R.id.entry_community_name);
+            this.progressBar = itemView.findViewById(R.id.entry_community_loading);
+            this.acceptImageView = itemView.findViewById(R.id.entry_community_accept);
+            this.refuseImageView = itemView.findViewById(R.id.entry_community_delete);
 
             itemView.setOnClickListener(this);
             this.acceptImageView.setOnClickListener(new View.OnClickListener() {
