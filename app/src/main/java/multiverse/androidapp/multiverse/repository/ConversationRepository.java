@@ -3,7 +3,8 @@ package multiverse.androidapp.multiverse.repository;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.lang.reflect.Array;
+import org.greenrobot.eventbus.EventBus;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,7 +29,6 @@ import multiverse.androidapp.multiverse.model.webModel.conversation.Conversation
 import multiverse.androidapp.multiverse.model.webModel.conversation.CreateConversationRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.MessageListResponseModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.SendMessageRequestWebModel;
-import multiverse.androidapp.multiverse.model.webModel.conversation.UpdateConversationRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.UpdateMessageRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.IDListRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.ListRequestWebModel;
@@ -36,7 +36,9 @@ import multiverse.androidapp.multiverse.repository.callback.ConversationCallback
 import multiverse.androidapp.multiverse.repository.callback.ConversationListCallback;
 import multiverse.androidapp.multiverse.repository.callback.MessageCallback;
 import multiverse.androidapp.multiverse.repository.callback.MessageListCallback;
-import multiverse.androidapp.multiverse.repository.callback.WebErrorCallback;
+import multiverse.androidapp.multiverse.repository.callback.WebError;
+import multiverse.androidapp.multiverse.repository.event.ConversationEvent;
+import multiverse.androidapp.multiverse.repository.event.MessageEvent;
 
 public class ConversationRepository {
 
@@ -86,7 +88,7 @@ public class ConversationRepository {
                     dbModel.lastDataUpdate = Calendar.getInstance().getTime().getTime();
                     ConversationLocalDbService.updateOrAddConversation(db, dbModel);
                 } else {
-                    callback.webErrorCallback(ConversationCallback.ConversationCallbackType.GET_CONVERSATION_INFO, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.GET_CONVERSATION_INFO, new WebError(webResponse));
                 }
             }
         });
@@ -110,8 +112,11 @@ public class ConversationRepository {
                     dbModel.lastDataUpdate = Calendar.getInstance().getTime().getTime();
                     dbModel.lastUpdate = Calendar.getInstance().getTime().getTime();
                     ConversationLocalDbService.updateConversation(dbHelper.getWritableDatabase(), dbModel);
+
+                    // Send the event to the bus
+                    EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, ConversationModel.toModel(dbModel)));
                 } else {
-                    callback.webErrorCallback(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, new WebError(webResponse));
                 }
             }
         });
@@ -128,7 +133,7 @@ public class ConversationRepository {
                     // Remove conversation from database if there
                     ConversationLocalDbService.deleteConversation(dbHelper.getWritableDatabase(), conversationID);
                 } else {
-                    callback.webErrorCallback(ConversationCallback.ConversationCallbackType.DELETE_CONVERSATION, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.DELETE_CONVERSATION, new WebError(webResponse));
                 }
             }
         });
@@ -157,7 +162,7 @@ public class ConversationRepository {
 
                     callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.CREATE_CONVERSATION);
                 } else {
-                    callback.webErrorCallback(ConversationCallback.ConversationCallbackType.CREATE_CONVERSATION, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.CREATE_CONVERSATION, new WebError(webResponse));
                 }
             }
         });
@@ -194,7 +199,7 @@ public class ConversationRepository {
                         ConversationLocalDbService.updateOrAddConversation(db, model.toDbModel());
                     }
                 } else {
-                    callback.webErrorCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationListErrorCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, new WebError(webResponse));
                 }
             }
         });
@@ -209,8 +214,11 @@ public class ConversationRepository {
                 WebServiceResponse<Void> webResponse = ConversationWebService.addUserToConversation(request, conversationID, context);
                 if(webResponse.isResponseOK) {
                     callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV);
+
+                    // Send event
+                    EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV, users));
                 } else {
-                    callback.webErrorCallback(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV, new WebError(webResponse));
                 }
             }
         });
@@ -225,8 +233,11 @@ public class ConversationRepository {
                 WebServiceResponse<Void> webResponse = ConversationWebService.removeUserFromConversation(request, conversationID, context);
                 if(webResponse.isResponseOK) {
                     callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV);
+
+                    // Send event
+                    EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV, users));
                 } else {
-                    callback.webErrorCallback(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV, new WebErrorCallback.WebError(webResponse));
+                    callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV, new WebError(webResponse));
                 }
             }
         });
@@ -244,8 +255,11 @@ public class ConversationRepository {
                     MessageLocalDbServices.addMessage(dbHelper.getWritableDatabase(), webResponse.data.toDbModel());
 
                     callback.messageActionCallback(MessageCallback.MessageCallbackType.SEND_MESSAGE, webResponse.data);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.SEND_MESSAGE, webResponse.data));
                 } else {
-                    callback.webErrorCallback(MessageCallback.MessageCallbackType.SEND_MESSAGE, new WebErrorCallback.WebError(webResponse));
+                    callback.messageErrorCallback(MessageCallback.MessageCallbackType.SEND_MESSAGE, new WebError(webResponse));
                 }
             }
         });
@@ -263,8 +277,11 @@ public class ConversationRepository {
                     MessageLocalDbServices.updateMessage(dbHelper.getWritableDatabase(), webResponse.data.toDbModel());
 
                     callback.messageActionCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, webResponse.data);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, webResponse.data));
                 } else {
-                    callback.webErrorCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, new WebErrorCallback.WebError(webResponse));
+                    callback.messageErrorCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, new WebError(webResponse));
                 }
             }
         });
@@ -280,8 +297,14 @@ public class ConversationRepository {
                     MessageLocalDbServices.deleteMessage(dbHelper.getWritableDatabase(), messageID);
 
                     callback.messageActionCallback(MessageCallback.MessageCallbackType.DELETE_MESSAGE, null);
+
+                    // Send event ot bus
+                    MessageModel messageModel = new MessageModel();
+                    messageModel.messageID = messageID;
+                    messageModel.conversationID = conversationID;
+                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.DELETE_MESSAGE, messageModel));
                 } else {
-                    callback.webErrorCallback(MessageCallback.MessageCallbackType.DELETE_MESSAGE, new WebErrorCallback.WebError(webResponse));
+                    callback.messageErrorCallback(MessageCallback.MessageCallbackType.DELETE_MESSAGE, new WebError(webResponse));
                 }
             }
         });
@@ -316,7 +339,7 @@ public class ConversationRepository {
                         MessageLocalDbServices.updateOrAddMessage(db, model.toDbModel());
                     }
                 } else {
-                    callback.webErrorCallback(MessageListCallback.MessageListCallbackType.MESSAGE_LIST, new WebErrorCallback.WebError(webResponse));
+                    callback.messageListErrorCallback(MessageListCallback.MessageListCallbackType.MESSAGE_LIST, new WebError(webResponse));
                 }
             }
         });

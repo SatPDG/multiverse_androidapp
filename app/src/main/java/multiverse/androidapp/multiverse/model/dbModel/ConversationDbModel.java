@@ -3,6 +3,8 @@ package multiverse.androidapp.multiverse.model.dbModel;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import multiverse.androidapp.multiverse.model.commonModel.ConversationModel;
+
 public class ConversationDbModel {
 
     public static final String TABLE_NAME = "conversation";

@@ -14,10 +14,10 @@
     <string name="network_relationship_deleteFollowed">/api/relationship/followed/%d</string>
     <string name="network_relationship_followerRequest">/api/relationship/follower/request</string>
     <string name="network_relationship_followedRequest">/api/relationship/followed/request</string>
-    <string name="network_relationship_acceptFollowedRequest">/api/relationship/follower/request/%d</string>
-    <string name="network_relationship_deleteFollowerRequest">/api/relationship/followed/request/%d</string>
-    <string name="network_relationship_sendFollowerRequest">/api/relationship/followed/request/%d</string>
-    <string name="network_relationship_deleteFollowedRequest">/api/relationship/follower/request/%d</string>
+    <string name="network_relationship_acceptFollowedRequest">/api/relationship/followed/request/%d</string>
+    <string name="network_relationship_deleteFollowerRequest">/api/relationship/follower/request/%d</string>
+    <string name="network_relationship_sendFollowerRequest">/api/relationship/follower/request/%d</string>
+    <string name="network_relationship_deleteFollowedRequest">/api/relationship/followed/request/%d</string>
     <string name="network_conversation_get">/api/conversation/%d</string>
     <string name="network_conversation_set">/api/conversation/%d</string>
     <string name="network_conversation_delete">/api/conversation/%d</string>
@@ -45,6 +45,7 @@
     <string name="general_serverError">A server error occur. Try Again!</string>
     <string name="general_device_offline">Your device is offline. Connect it online!</string>
     <string name="general_ressource_not_accessible">The data your are trying to access is not accessible… Go back!</string>
+    <string name="general_empty_list">Empty List...</string>
 
     <!-- Register Strings -->
     <string name="register_repeat_password">Repeat the Password</string>
@@ -84,6 +85,13 @@
     <string name="user_removeFollowed">Remove Followed</string>
     <string name="user_sendMessage">Send Message</string>
 
+    <!-- Community Section -->
+    <string name="community_actionbar_title">Community</string>
+    <string name="community_follower">Follower</string>
+    <string name="community_followed">Followed</string>
+    <string name="community_follower_request">Follower Request</string>
+    <string name="community_followed_request">Followed Request</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_authentication">AuthenticationActivity</string>
@@ -95,4 +103,7 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_activity_community">CommunityActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

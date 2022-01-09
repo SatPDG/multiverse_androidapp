@@ -7,4 +7,8 @@ public class UserInfoRespositoryModel {
     public String lastname;
     public int nbrOfFollower;
     public int nbrOfFollowed;
+    public boolean isAFollower;
+    public boolean isFollowed;
+    public boolean isFollowerRequestReceived;
+    public boolean isFollowedRequestSend;
 }

@@ -22,7 +22,7 @@ import multiverse.androidapp.multiverse.model.webModel.user.UserResponseWebModel
 import multiverse.androidapp.multiverse.model.webModel.user.UserSearchRequestWebModel;
 import multiverse.androidapp.multiverse.repository.callback.UserCallback;
 import multiverse.androidapp.multiverse.repository.callback.UserListCallback;
-import multiverse.androidapp.multiverse.repository.callback.WebErrorCallback;
+import multiverse.androidapp.multiverse.repository.callback.WebError;
 import multiverse.androidapp.multiverse.util.sharedPreference.SharedPreference;
 
 public class UserRepository {
@@ -49,6 +49,10 @@ public class UserRepository {
                     model.userID = userID;
                     model.nbrOfFollower = -1;
                     model.nbrOfFollowed = -1;
+                    model.isAFollower = false;
+                    model.isFollowed = false;
+                    model.isFollowerRequestReceived = false;
+                    model.isFollowedRequestSend = false;
                     callback.userInfoCallback(model);
                 }
 
@@ -61,6 +65,10 @@ public class UserRepository {
                     model.userID = webResponse.data.userID;
                     model.nbrOfFollower = webResponse.data.nbrOfFollower;
                     model.nbrOfFollowed = webResponse.data.nbrOfFollowed;
+                    model.isAFollower = webResponse.data.isAFollower;
+                    model.isFollowed = webResponse.data.isFollowed;
+                    model.isFollowerRequestReceived = webResponse.data.isFollowerRequestPending;
+                    model.isFollowedRequestSend = webResponse.data.isFollowedRequestPending;
                     callback.userInfoCallback(model);
 
                     // Update the local db
@@ -72,58 +80,77 @@ public class UserRepository {
                     user.lastDataUpdate = Calendar.getInstance().getTime().getTime();
                     UserLocalDbService.addOrUpdateUser(db, user);
                 } else {
-                    WebErrorCallback.WebError webError = new WebErrorCallback.WebError(webResponse);
-                    callback.webErrorCallback(null, webError);
+                    WebError webError = new WebError(webResponse);
+                    callback.userErrorCallback(webError);
                 }
             }
         });
     }
 
+//    public void getSimpleUserInfo(final int userID, final UserCallback callback, final Context context) {
+//        executor.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                // Go fetch the user from the local db
+//                SQLiteDatabase db = dbHelper.getReadableDatabase();
+//                UserDbModel dbUser = UserLocalDbService.getUser(db, userID);
+//                UserModel user = dbUser.toModel();
+//
+//                callback.userSimpleInfoCallback(user);
+//            }
+//        });
+//    }
+
     public void getUserOwnInfo(final UserCallback callback, final Context context) {
-        int userID = SharedPreference.getUserID(context);
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                int userID = SharedPreference.getUserID(context);
 
-        // Check if we have some basic information in the local database
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        UserDbModel dbUser = UserLocalDbService.getUser(db, userID);
-        if(dbUser != null) {
-            UserOwnInfoRepositoryModel model = new UserOwnInfoRepositoryModel();
-            model.firstname = dbUser.firstname;
-            model.lastname = dbUser.lastname;
-            model.userID = userID;
-            model.nbrOfFollower = -1;
-            model.nbrOfFollowed = -1;
-            model.nbrOfRequestFollower = -1;
-            model.nbrOfRequestFollowed = -1;
-            model.nbrOfConversation = -1;
-            callback.userOwnInfoCallback(model);
-        }
+                // Check if we have some basic information in the local database
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                UserDbModel dbUser = UserLocalDbService.getUser(db, userID);
+                if (dbUser != null) {
+                    UserOwnInfoRepositoryModel model = new UserOwnInfoRepositoryModel();
+                    model.firstname = dbUser.firstname;
+                    model.lastname = dbUser.lastname;
+                    model.userID = userID;
+                    model.nbrOfFollower = -1;
+                    model.nbrOfFollowed = -1;
+                    model.nbrOfRequestFollower = -1;
+                    model.nbrOfRequestFollowed = -1;
+                    model.nbrOfConversation = -1;
+                    callback.userOwnInfoCallback(model);
+                }
 
-        // Call the web api for more information
-        WebServiceResponse<UserOwnResponseWebModel> webResponse = UserWebService.getUserOwnInfo(context);
-        if(webResponse.isResponseOK) {
-            UserOwnInfoRepositoryModel model = new UserOwnInfoRepositoryModel();
-            model.firstname = webResponse.data.firstname;
-            model.lastname = webResponse.data.lastname;
-            model.userID = webResponse.data.userID;
-            model.nbrOfFollower = webResponse.data.nbrOfFollower;
-            model.nbrOfFollowed = webResponse.data.nbrOfFollowed;
-            model.nbrOfRequestFollower = webResponse.data.nbrOfRequestFollower;
-            model.nbrOfRequestFollowed = webResponse.data.nbrOfRequestFollowed;
-            model.nbrOfConversation = webResponse.data.nbrOfConversation;
-            callback.userOwnInfoCallback(model);
+                // Call the web api for more information
+                WebServiceResponse<UserOwnResponseWebModel> webResponse = UserWebService.getUserOwnInfo(context);
+                if (webResponse.isResponseOK) {
+                    UserOwnInfoRepositoryModel model = new UserOwnInfoRepositoryModel();
+                    model.firstname = webResponse.data.firstname;
+                    model.lastname = webResponse.data.lastname;
+                    model.userID = webResponse.data.userID;
+                    model.nbrOfFollower = webResponse.data.nbrOfFollower;
+                    model.nbrOfFollowed = webResponse.data.nbrOfFollowed;
+                    model.nbrOfRequestFollower = webResponse.data.nbrOfRequestFollower;
+                    model.nbrOfRequestFollowed = webResponse.data.nbrOfRequestFollowed;
+                    model.nbrOfConversation = webResponse.data.nbrOfConversation;
+                    callback.userOwnInfoCallback(model);
 
-            // Update the local db
-            UserDbModel user = new UserDbModel();
-            user.userID = webResponse.data.userID;
-            user.firstname = webResponse.data.firstname;
-            user.lastname = webResponse.data.lastname;
-            user.lastLocation = "";
-            user.lastDataUpdate = Calendar.getInstance().getTime().getTime();
-            UserLocalDbService.addOrUpdateUser(db, user);
-        } else {
-            WebErrorCallback.WebError webError = new WebErrorCallback.WebError(webResponse);
-            callback.webErrorCallback(null, webError);
-        }
+                    // Update the local db
+                    UserDbModel user = new UserDbModel();
+                    user.userID = webResponse.data.userID;
+                    user.firstname = webResponse.data.firstname;
+                    user.lastname = webResponse.data.lastname;
+                    user.lastLocation = "";
+                    user.lastDataUpdate = Calendar.getInstance().getTime().getTime();
+                    UserLocalDbService.addOrUpdateUser(db, user);
+                } else {
+                    WebError webError = new WebError(webResponse);
+                    callback.userErrorCallback(webError);
+                }
+            }
+        });
     }
 
     public void getUserList(final UserListCallback callback, final Context context) {
@@ -148,7 +175,7 @@ public class UserRepository {
                         userList.addAll(webResponse.data.users);
                         callback.userListCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, userList, 10, 0, 10);
                     } else {
-                        callback.webErrorCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, new WebErrorCallback.WebError(webResponse));
+                        callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, new WebError(webResponse));
                     }
                 }
             }
@@ -173,7 +200,7 @@ public class UserRepository {
                     userList.addAll(webResponse.data.users);
                     callback.userListCallback(UserListCallback.UserCallbackType.USER_NAME_SEARCH, userList, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
                 } else {
-                    callback.webErrorCallback(UserListCallback.UserCallbackType.USER_NAME_SEARCH, new WebErrorCallback.WebError(webResponse));
+                    callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_NAME_SEARCH, new WebError(webResponse));
                 }
             }
         });

@@ -83,7 +83,7 @@ public class RelationshipWebService {
         return ApiCaller.callApi(new Supplier<ApiResponse<Void>>() {
             @Override
             public ApiResponse<Void> get() {
-                return HttpService.delete(String.format(context.getString(R.string.network_relationship_deleteFollower), followedID), null, Void.class, context);
+                return HttpService.delete(String.format(context.getString(R.string.network_relationship_deleteFollowerRequest), followedID), null, Void.class, context);
             }
         }, context);
     }

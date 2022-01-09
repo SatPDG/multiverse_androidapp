@@ -20,7 +20,7 @@ import multiverse.androidapp.multiverse.model.webModel.notification.Notification
 import multiverse.androidapp.multiverse.model.webModel.notification.UserNotificationResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.ListRequestWebModel;
 import multiverse.androidapp.multiverse.repository.callback.NotificationListCallback;
-import multiverse.androidapp.multiverse.repository.callback.WebErrorCallback;
+import multiverse.androidapp.multiverse.repository.callback.WebError;
 
 public class NotificationRepository {
 
@@ -76,7 +76,7 @@ public class NotificationRepository {
                         NotificationLocalDbService.updateOrAddNotification(db, NotificationDbModel.toDbModel(notif));
                     }
                 } else {
-                    callback.webErrorCallback(NotificationListCallback.NotificationListCallbackType.NOTIFICATION, new WebErrorCallback.WebError(webReponse));
+                    callback.notificationErrorCallback(NotificationListCallback.NotificationListCallbackType.NOTIFICATION, new WebError(webReponse));
                 }
             }
         });

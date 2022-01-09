@@ -1,5 +1,6 @@
 package multiverse.androidapp.multiverse.ui.authentication;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 
@@ -18,10 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import multiverse.androidapp.multiverse.MainActivity;
 import multiverse.androidapp.multiverse.R;
 import multiverse.androidapp.multiverse.model.repositoryModel.authentication.AuthenticationResponseRepositoryModel;
 
 public class LoginFragment extends Fragment {
+
+    public static final String LOGIN_FRAGMENT_TAG = "login_fragment_tag";
 
     private LoginViewModel viewModel;
 
@@ -49,7 +53,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.auth_frag_container, RegisterFragment.newInstance());
+                transaction.replace(R.id.auth_frag_container, RegisterFragment.newInstance(), RegisterFragment.REGISTER_FRAGMENT_TAG);
                 transaction.commit();
             }
         });
@@ -96,7 +100,9 @@ public class LoginFragment extends Fragment {
                 if(authenticationCode != null) {
                     if(authenticationCode == AuthenticationResponseRepositoryModel.AuthenticationCode.OK) {
                         // Go back to main activity
-                        Toast.makeText(getContext(), "OKOKOKOKOKOKOKOOKOKOKOK", Toast.LENGTH_LONG).show();
+                        Intent intent = MainActivity.newInstance(getContext());
+                        startActivity(intent);
+                        getActivity().finish();
                     } else if(authenticationCode == AuthenticationResponseRepositoryModel.AuthenticationCode.BAD_CREDENTIAL) {
                         Toast.makeText(getContext(), getString(R.string.login_badCredential), Toast.LENGTH_LONG).show();
                     } else {

@@ -2,6 +2,8 @@ package multiverse.androidapp.multiverse.repository;
 
 import android.content.Context;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -14,7 +16,8 @@ import multiverse.androidapp.multiverse.model.webModel.user.UserListResponseWebM
 import multiverse.androidapp.multiverse.model.webModel.util.ListRequestWebModel;
 import multiverse.androidapp.multiverse.repository.callback.RelationshipCallback;
 import multiverse.androidapp.multiverse.repository.callback.UserListCallback;
-import multiverse.androidapp.multiverse.repository.callback.WebErrorCallback;
+import multiverse.androidapp.multiverse.repository.callback.WebError;
+import multiverse.androidapp.multiverse.repository.event.RelationshipEvent;
 
 public class RelationshipRepository {
 
@@ -40,7 +43,7 @@ public class RelationshipRepository {
                     list.addAll(webService.data.users);
                     callback.userListCallback(UserListCallback.UserCallbackType.USER_FOLLOWER, list, webService.data.count, webService.data.offset, webService.data.totalSize);
                 } else {
-                    callback.webErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWER, new WebErrorCallback.WebError(webService));
+                    callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWER, new WebError(webService));
                 }
             }
         });
@@ -60,7 +63,7 @@ public class RelationshipRepository {
                     list.addAll(webService.data.users);
                     callback.userListCallback(UserListCallback.UserCallbackType.USER_FOLLOWED, list, webService.data.count, webService.data.offset, webService.data.totalSize);
                 } else {
-                    callback.webErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWED, new WebErrorCallback.WebError(webService));
+                    callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWED, new WebError(webService));
                 }
             }
         });
@@ -80,7 +83,7 @@ public class RelationshipRepository {
                     list.addAll(webService.data.users);
                     callback.userListCallback(UserListCallback.UserCallbackType.USER_FOLLOWER_REQ, list, webService.data.count, webService.data.offset, webService.data.totalSize);
                 } else {
-                    callback.webErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWER_REQ, new WebErrorCallback.WebError(webService));
+                    callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWER_REQ, new WebError(webService));
                 }
             }
         });
@@ -100,7 +103,7 @@ public class RelationshipRepository {
                     list.addAll(webService.data.users);
                     callback.userListCallback(UserListCallback.UserCallbackType.USER_FOLLOWED_REQ, list, webService.data.count, webService.data.offset, webService.data.totalSize);
                 } else {
-                    callback.webErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWED_REQ, new WebErrorCallback.WebError(webService));
+                    callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_FOLLOWED_REQ, new WebError(webService));
                 }
             }
         });
@@ -112,9 +115,12 @@ public class RelationshipRepository {
             public void run() {
                 WebServiceResponse<Void> webService = RelationshipWebService.sendFollowerRequest(userID, context);
                 if(webService.isResponseOK) {
-                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.SEND_FOLLOWED_REQ);
+                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.SEND_FOLLOWED_REQ, userID);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new RelationshipEvent(RelationshipCallback.RelationCallbackType.SEND_FOLLOWED_REQ, userID));
                 } else {
-                    callback.webErrorCallback(RelationshipCallback.RelationCallbackType.SEND_FOLLOWED_REQ, new WebErrorCallback.WebError(webService));
+                    callback.relationshipErrorCallback(RelationshipCallback.RelationCallbackType.SEND_FOLLOWED_REQ, new WebError(webService));
                 }
             }
         });
@@ -126,9 +132,12 @@ public class RelationshipRepository {
             public void run() {
                 WebServiceResponse<Void> webService = RelationshipWebService.acceptFollowedRequest(userID, context);
                 if(webService.isResponseOK) {
-                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.ACCEPT_FOLLOWED_REQ);
+                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.ACCEPT_FOLLOWER_REQ, userID);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new RelationshipEvent(RelationshipCallback.RelationCallbackType.ACCEPT_FOLLOWER_REQ, userID));
                 } else {
-                    callback.webErrorCallback(RelationshipCallback.RelationCallbackType.ACCEPT_FOLLOWED_REQ, new WebErrorCallback.WebError(webService));
+                    callback.relationshipErrorCallback(RelationshipCallback.RelationCallbackType.ACCEPT_FOLLOWER_REQ, new WebError(webService));
                 }
             }
         });
@@ -140,9 +149,12 @@ public class RelationshipRepository {
             public void run() {
                 WebServiceResponse<Void> webService = RelationshipWebService.deleteFollowerUser(userID, context);
                 if(webService.isResponseOK) {
-                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER);
+                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER, userID);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new RelationshipEvent(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER, userID));
                 } else {
-                    callback.webErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER, new WebErrorCallback.WebError(webService));
+                    callback.relationshipErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER, new WebError(webService));
                 }
             }
         });
@@ -154,9 +166,12 @@ public class RelationshipRepository {
             public void run() {
                 WebServiceResponse<Void> webService = RelationshipWebService.deleteFollowedUser(userID, context);
                 if(webService.isResponseOK) {
-                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED);
+                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED, userID);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new RelationshipEvent(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED, userID));
                 } else {
-                    callback.webErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED, new WebErrorCallback.WebError(webService));
+                    callback.relationshipErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED, new WebError(webService));
                 }
             }
         });
@@ -168,9 +183,12 @@ public class RelationshipRepository {
             public void run() {
                 WebServiceResponse<Void> webService = RelationshipWebService.deleteFollowerRequest(userID, context);
                 if(webService.isResponseOK) {
-                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER_REQ);
+                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER_REQ, userID);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new RelationshipEvent(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER_REQ, userID));
                 } else {
-                    callback.webErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER_REQ, new WebErrorCallback.WebError(webService));
+                    callback.relationshipErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWER_REQ, new WebError(webService));
                 }
             }
         });
@@ -180,11 +198,14 @@ public class RelationshipRepository {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                WebServiceResponse<Void> webService = RelationshipWebService.deleteFollowerRequest(userID, context);
+                WebServiceResponse<Void> webService = RelationshipWebService.deleteFollowedRequest(userID, context);
                 if(webService.isResponseOK) {
-                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED_REQ);
+                    callback.relationshipActionCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED_REQ, userID);
+
+                    // Send event to bus
+                    EventBus.getDefault().post(new RelationshipEvent(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED_REQ, userID));
                 } else {
-                    callback.webErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED_REQ, new WebErrorCallback.WebError(webService));
+                    callback.relationshipErrorCallback(RelationshipCallback.RelationCallbackType.DELETE_FOLLOWED_REQ, new WebError(webService));
                 }
             }
         });

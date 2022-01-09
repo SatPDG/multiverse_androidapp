@@ -1,5 +1,7 @@
 package multiverse.androidapp.multiverse.model.dbModel;
 
+import multiverse.androidapp.multiverse.model.commonModel.ConversationModel;
+
 public class ConversationUserDbModel {
 
     public static final String TABLE_NAME = "conversationUser";
@@ -19,4 +21,5 @@ public class ConversationUserDbModel {
     public int conversationID;
     public int userID;
     public int lastDataUpdate;
+
 }

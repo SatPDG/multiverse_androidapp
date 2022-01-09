@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_users"
-        android:name="multiverse.androidapp.multiverse.ui.users.UsersFragment"
+        android:name="multiverse.androidapp.multiverse.ui.search.SearchFragment"
         android:label="@string/main_users"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_search" />
 
     <fragment
         android:id="@+id/navigation_notifications"

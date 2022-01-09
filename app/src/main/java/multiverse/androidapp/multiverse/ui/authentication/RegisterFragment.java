@@ -1,5 +1,6 @@
 package multiverse.androidapp.multiverse.ui.authentication;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 
@@ -18,10 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import multiverse.androidapp.multiverse.MainActivity;
 import multiverse.androidapp.multiverse.R;
 import multiverse.androidapp.multiverse.model.repositoryModel.authentication.AuthenticationResponseRepositoryModel;
 
 public class RegisterFragment extends Fragment {
+
+    public static final String REGISTER_FRAGMENT_TAG = "login_fragment_tag";
 
     private RegisterViewModel viewModel;
 
@@ -54,7 +58,7 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.auth_frag_container, LoginFragment.newInstance());
+                transaction.replace(R.id.auth_frag_container, LoginFragment.newInstance(), LoginFragment.LOGIN_FRAGMENT_TAG);
                 transaction.commit();
             }
         });
@@ -130,6 +134,9 @@ public class RegisterFragment extends Fragment {
                 if(authenticationCode != null){
                     if(authenticationCode == AuthenticationResponseRepositoryModel.AuthenticationCode.OK) {
                         // Go to main app
+                        Intent intent = MainActivity.newInstance(getContext());
+                        startActivity(intent);
+                        getActivity().finish();
                     } else if(authenticationCode == AuthenticationResponseRepositoryModel.AuthenticationCode.EMAIL_ALREADY_IN_USE) {
                         Toast.makeText(getContext(), getString(R.string.register_emailAlreadyExists), Toast.LENGTH_LONG).show();
                     } else {
@@ -144,8 +151,6 @@ public class RegisterFragment extends Fragment {
     public static RegisterFragment newInstance() {
         RegisterFragment fragment = new RegisterFragment();
         Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
-        //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }

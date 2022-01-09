@@ -1,6 +1,7 @@
 package multiverse.androidapp.multiverse;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import multiverse.androidapp.multiverse.database.localDatabase.MultiverseDbHelper;
 import multiverse.androidapp.multiverse.ui.authentication.RegisterFragment;
+import multiverse.androidapp.multiverse.ui.community.CommunityType;
 import multiverse.androidapp.multiverse.ui.user.UserFragment;
 import multiverse.androidapp.multiverse.util.sharedPreference.SharedPreference;
 
@@ -39,17 +41,13 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setEnterTransition(new Slide(Gravity.LEFT));
         getWindow().setExitTransition(new Slide(Gravity.LEFT));
 
-        // Start the general activity
-        Intent intent = GeneralActivity.getUserInstance(getApplicationContext(), 12);
-        startActivity(intent);
-
-
+        // If their is no user authenticated, go back to authentication.
         if(SharedPreference.getAuthToken(getApplicationContext()) == null) {
             // Launch authentication activity
-//            Intent intent = new Intent(this, AuthenticationActivity.class);
-//            startActivity(intent);
+            Intent intent = AuthenticationActivity.newInstance(this);
+            startActivity(intent);
+            finish();
         }
-
 
 
         {
@@ -70,19 +68,41 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        setUpActionBar();
+    }
+
+    private void setUpActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setCustomView(R.layout.custom_main_action_bar);
 
         View customBarView = actionBar.getCustomView();
+
+        // User button
         ImageView userImageView = customBarView.findViewById(R.id.main_actionbar_user);
         userImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = GeneralActivity.getUserInstance(getApplicationContext(), 0);
+                int currentUserID = SharedPreference.getUserID(getApplicationContext());
+                Intent intent = GeneralActivity.getUserInstance(getApplicationContext(), currentUserID);
                 startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle());
             }
         });
+
+        // notification button
+        ImageView notificationImageView = customBarView.findViewById(R.id.main_actionbar_notification);
+        notificationImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    public static Intent newInstance(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        return intent;
     }
 }
