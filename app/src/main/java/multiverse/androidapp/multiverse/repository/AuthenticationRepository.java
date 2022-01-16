@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 
 import multiverse.androidapp.multiverse.database.webDatabase.webServices.ApiResponse;
 import multiverse.androidapp.multiverse.database.webDatabase.webServices.AuthenticationWebService;
-import multiverse.androidapp.multiverse.model.commonModel.LocationModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.LocationWebModel;
 import multiverse.androidapp.multiverse.model.repositoryModel.authentication.AuthenticationResponseRepositoryModel;
 import multiverse.androidapp.multiverse.model.repositoryModel.authentication.NewUserRepositoryModel;
 import multiverse.androidapp.multiverse.model.webModel.authentication.LoginRequestWebModel;
@@ -65,7 +65,7 @@ public class AuthenticationRepository {
                 webRequest.password = newUser.password;
                 webRequest.firstname = newUser.firstname;
                 webRequest.lastname = newUser.lastname;
-                webRequest.lastLocation = new LocationModel(newUser.longitude, newUser.latitude);
+                webRequest.lastLocation = new LocationWebModel(newUser.longitude, newUser.latitude);
 
                 ApiResponse<RegisterResponseWebModel> webResponse = AuthenticationWebService.register(webRequest, context);
 

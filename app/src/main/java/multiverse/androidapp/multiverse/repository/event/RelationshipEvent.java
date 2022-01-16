@@ -1,6 +1,5 @@
 package multiverse.androidapp.multiverse.repository.event;
 
-import multiverse.androidapp.multiverse.model.commonModel.UserModel;
 import multiverse.androidapp.multiverse.repository.callback.RelationshipCallback;
 
 public class RelationshipEvent {

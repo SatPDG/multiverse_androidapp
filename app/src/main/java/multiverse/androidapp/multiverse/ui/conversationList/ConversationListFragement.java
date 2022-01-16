@@ -1,65 +1,79 @@
 package multiverse.androidapp.multiverse.ui.conversationList;
 
+import android.animation.Animator;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import multiverse.androidapp.multiverse.R;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.ConversationWebModel;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ConversationListFragement#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ConversationListFragement extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class ConversationListFragement extends Fragment implements ConversationListClickListener {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ConversationListViewModel viewModel;
+
+    private RecyclerView conversationRecylerView;
+    private ConstraintLayout searchContraintLayout;
+    private AppCompatEditText searchTextEdit;
+    private AppCompatImageButton searchButton;
 
     public ConversationListFragement() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ConversationListFragement.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ConversationListFragement newInstance(String param1, String param2) {
+    public static ConversationListFragement newInstance() {
         ConversationListFragement fragment = new ConversationListFragement();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_conversation_list, container, false);
+        View root = inflater.inflate(R.layout.fragment_conversation_list, container, false);
+
+        conversationRecylerView = root.findViewById(R.id.conversation_list_list);
+        searchContraintLayout = root.findViewById(R.id.conversation_list_search_container);
+        searchButton = root.findViewById(R.id.conversation_list_search_btn);
+        searchTextEdit = root.findViewById(R.id.conversation_list_search_text);
+
+        viewModel = new ViewModelProvider(requireActivity()).get(ConversationListViewModel.class);
+
+        // Set up the list adapter
+        LinearLayoutManager llm = new LinearLayoutManager(getContext());
+        llm.setOrientation(RecyclerView.VERTICAL);
+        conversationRecylerView.setLayoutManager(llm);
+        ConversationListAdapter listAdapter = new ConversationListAdapter(getContext(), viewModel, this);
+        conversationRecylerView.setAdapter(listAdapter);
+
+        return root;
+    }
+
+    @Override
+    public void conversationClickListener(ConversationWebModel conversation) {
+
     }
 }

@@ -46,6 +46,10 @@
     <string name="general_device_offline">Your device is offline. Connect it online!</string>
     <string name="general_ressource_not_accessible">The data your are trying to access is not accessible… Go back!</string>
     <string name="general_empty_list">Empty List...</string>
+    <string name="general_year">Year</string>
+    <string name="general_month">Month</string>
+    <string name="general_day">Day</string>
+    <string name="general_minute">Minute</string>
 
     <!-- Register Strings -->
     <string name="register_repeat_password">Repeat the Password</string>

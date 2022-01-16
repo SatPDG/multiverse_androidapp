@@ -4,7 +4,7 @@ import android.content.Context;
 
 import multiverse.androidapp.multiverse.R;
 import multiverse.androidapp.multiverse.database.webDatabase.HttpService;
-import multiverse.androidapp.multiverse.model.commonModel.UserModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 import multiverse.androidapp.multiverse.model.webModel.authentication.LoginRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.authentication.LoginResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.authentication.RefreshRequestWebModel;
@@ -30,7 +30,7 @@ public class AuthenticationWebService {
         return HttpService.post(context.getString(R.string.network_auth_refresh), request, RefreshResponseWebModel.class, context);
     }
 
-    public static ApiResponse<UserModel> test(Context context) {
-        return HttpService.get("/api/authentication/test", UserModel.class, context);
+    public static ApiResponse<UserWebModel> test(Context context) {
+        return HttpService.get("/api/authentication/test", UserWebModel.class, context);
     }
 }

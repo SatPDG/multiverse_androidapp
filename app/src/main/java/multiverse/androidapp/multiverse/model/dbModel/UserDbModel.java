@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import multiverse.androidapp.multiverse.model.commonModel.UserModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 
 public class UserDbModel {
 
@@ -44,7 +45,7 @@ public class UserDbModel {
         return content;
     }
 
-    public UserModel toModel() {
+    public UserModel toCommonModel() {
         UserModel user = new UserModel();
         user.firstname = firstname;
         user.lastname = lastname;

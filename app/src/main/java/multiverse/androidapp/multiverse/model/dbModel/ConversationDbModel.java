@@ -3,6 +3,8 @@ package multiverse.androidapp.multiverse.model.dbModel;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import java.util.Date;
+
 import multiverse.androidapp.multiverse.model.commonModel.ConversationModel;
 
 public class ConversationDbModel {
@@ -38,6 +40,14 @@ public class ConversationDbModel {
         content.put(LAST_DATA_UPDATE_COLUMN_NAME, lastDataUpdate);
 
         return content;
+    }
+
+    public ConversationModel toCommonModel() {
+        ConversationModel model = new ConversationModel();
+        model.conversationID = conversationID;
+        model.name = name;
+        model.lastUpdate = new Date(lastUpdate);
+        return model;
     }
 
     public static ConversationDbModel toDbModel(Cursor cursor) {

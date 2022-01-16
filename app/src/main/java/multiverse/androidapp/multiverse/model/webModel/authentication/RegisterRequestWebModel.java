@@ -1,6 +1,6 @@
 package multiverse.androidapp.multiverse.model.webModel.authentication;
 
-import multiverse.androidapp.multiverse.model.commonModel.LocationModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.LocationWebModel;
 
 public class RegisterRequestWebModel {
 
@@ -8,6 +8,6 @@ public class RegisterRequestWebModel {
     public String password;
     public String firstname;
     public String lastname;
-    public LocationModel lastLocation;
+    public LocationWebModel lastLocation;
 
 }

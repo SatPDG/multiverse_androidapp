@@ -2,11 +2,11 @@ package multiverse.androidapp.multiverse.model.webModel.user;
 
 import java.util.List;
 
-import multiverse.androidapp.multiverse.model.commonModel.UserModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 
 public class UserListResponseWebModel {
 
-    public List<UserModel> users;
+    public List<UserWebModel> users;
     public int count;
     public int offset;
     public int totalSize;

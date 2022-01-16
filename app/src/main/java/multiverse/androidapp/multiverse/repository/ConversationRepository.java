@@ -20,6 +20,8 @@ import multiverse.androidapp.multiverse.database.webDatabase.WebServiceResponse;
 import multiverse.androidapp.multiverse.database.webDatabase.webServices.ConversationWebService;
 import multiverse.androidapp.multiverse.model.commonModel.ConversationModel;
 import multiverse.androidapp.multiverse.model.commonModel.MessageModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.ConversationWebModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.MessageWebModel;
 import multiverse.androidapp.multiverse.model.dbModel.ConversationDbModel;
 import multiverse.androidapp.multiverse.model.dbModel.MessageDbModel;
 import multiverse.androidapp.multiverse.model.repositoryModel.conversation.ConversationInfoRespositoryModel;
@@ -114,7 +116,7 @@ public class ConversationRepository {
                     ConversationLocalDbService.updateConversation(dbHelper.getWritableDatabase(), dbModel);
 
                     // Send the event to the bus
-                    EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, ConversationModel.toModel(dbModel)));
+                    EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, dbModel.toCommonModel()));
                 } else {
                     callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, new WebError(webResponse));
                 }
@@ -146,7 +148,7 @@ public class ConversationRepository {
                 CreateConversationRequestWebModel request = new CreateConversationRequestWebModel();
                 request.name = name;
                 request.users = userList;
-                WebServiceResponse<ConversationModel> webResponse = ConversationWebService.createConversation(request, context);
+                WebServiceResponse<ConversationWebModel> webResponse = ConversationWebService.createConversation(request, context);
                 if(webResponse.isResponseOK) {
                     // Add conversation to db
                     ConversationDbModel dbModel = new ConversationDbModel();
@@ -168,7 +170,7 @@ public class ConversationRepository {
         });
     }
 
-    public void getConversationList(final int conversationID, final int count, final int offset, final ConversationListCallback callback, final Context context) {
+    public void getConversationList(final int count, final int offset, final ConversationListCallback callback, final Context context) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -178,7 +180,7 @@ public class ConversationRepository {
                 if(dbList.size() > 0) {
                     List<ConversationModel> list = new ArrayList<>();
                     for(ConversationDbModel dbModel : dbList) {
-                        list.add(ConversationModel.toModel(dbModel));
+                        list.add(dbModel.toCommonModel());
                     }
                     int totalSize = ConversationLocalDbService.getSize(db);
                     callback.conversationListCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, list, count, offset, totalSize);
@@ -191,11 +193,13 @@ public class ConversationRepository {
                 WebServiceResponse<ConversationListResponseWebModel> webResponse = ConversationWebService.getConversationList(request, context);
                 if(webResponse.isResponseOK) {
                     ArrayList<ConversationModel> list = new ArrayList<>();
-                    list.addAll(webResponse.data.conversations);
+                    for (ConversationWebModel webModel : webResponse.data.conversations) {
+                        list.add(webModel.toCommonModel());
+                    }
                     callback.conversationListCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, list, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
 
                     // Update the database
-                    for(ConversationModel model : webResponse.data.conversations) {
+                    for (ConversationModel model : list) {
                         ConversationLocalDbService.updateOrAddConversation(db, model.toDbModel());
                     }
                 } else {
@@ -249,15 +253,17 @@ public class ConversationRepository {
             public void run() {
                 SendMessageRequestWebModel request = new SendMessageRequestWebModel();
                 request.message = message;
-                WebServiceResponse<MessageModel> webResponse = ConversationWebService.sendMessage(request, conversationID, context);
+                WebServiceResponse<MessageWebModel> webResponse = ConversationWebService.sendMessage(request, conversationID, context);
                 if(webResponse.isResponseOK) {
-                    // Add the message to the database
-                    MessageLocalDbServices.addMessage(dbHelper.getWritableDatabase(), webResponse.data.toDbModel());
+                    MessageModel model = webResponse.data.toCommonModel();
 
-                    callback.messageActionCallback(MessageCallback.MessageCallbackType.SEND_MESSAGE, webResponse.data);
+                    // Add the message to the database
+                    MessageLocalDbServices.addMessage(dbHelper.getWritableDatabase(), model.toDbModel());
+
+                    callback.messageActionCallback(MessageCallback.MessageCallbackType.SEND_MESSAGE, model);
 
                     // Send event to bus
-                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.SEND_MESSAGE, webResponse.data));
+                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.SEND_MESSAGE, model));
                 } else {
                     callback.messageErrorCallback(MessageCallback.MessageCallbackType.SEND_MESSAGE, new WebError(webResponse));
                 }
@@ -271,15 +277,17 @@ public class ConversationRepository {
             public void run() {
                 UpdateMessageRequestWebModel request = new UpdateMessageRequestWebModel();
                 request.message = message;
-                WebServiceResponse<MessageModel> webResponse = ConversationWebService.updateMessage(request, conversationID, messageID, context);
+                WebServiceResponse<MessageWebModel> webResponse = ConversationWebService.updateMessage(request, conversationID, messageID, context);
                 if(webResponse.isResponseOK) {
-                    // Update the message to the database
-                    MessageLocalDbServices.updateMessage(dbHelper.getWritableDatabase(), webResponse.data.toDbModel());
+                    MessageModel model = webResponse.data.toCommonModel();
 
-                    callback.messageActionCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, webResponse.data);
+                    // Update the message to the database
+                    MessageLocalDbServices.updateMessage(dbHelper.getWritableDatabase(), model.toDbModel());
+
+                    callback.messageActionCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, model);
 
                     // Send event to bus
-                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, webResponse.data));
+                    EventBus.getDefault().post(new MessageEvent(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, model));
                 } else {
                     callback.messageErrorCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, new WebError(webResponse));
                 }
@@ -320,7 +328,7 @@ public class ConversationRepository {
                 if(dbList.size() > 0) {
                     List<MessageModel> modelList = new ArrayList<>();
                     for(MessageDbModel dbModel : dbList) {
-                        modelList.add(MessageModel.toModel(dbModel));
+                        modelList.add(dbModel.toCommonModel());
                     }
                     int totalSize = MessageLocalDbServices.getSize(db);
                     callback.messageListCallback(MessageListCallback.MessageListCallbackType.MESSAGE_LIST, modelList, offset, count, totalSize);
@@ -332,10 +340,14 @@ public class ConversationRepository {
                 request.count = count;
                 WebServiceResponse<MessageListResponseModel> webResponse = ConversationWebService.getMessageList(request, conversationID, context);
                 if(webResponse.isResponseOK) {
-                    callback.messageListCallback(MessageListCallback.MessageListCallbackType.MESSAGE_LIST, webResponse.data.messages, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
+                    ArrayList<MessageModel> modelList = new ArrayList<>();
+                    for (MessageWebModel webModel : webResponse.data.messages) {
+                        modelList.add(webModel.toCommonModel());
+                    }
+                    callback.messageListCallback(MessageListCallback.MessageListCallbackType.MESSAGE_LIST, modelList, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
 
                     // Add messages to db
-                    for(MessageModel model : webResponse.data.messages) {
+                    for (MessageModel model : modelList) {
                         MessageLocalDbServices.updateOrAddMessage(db, model.toDbModel());
                     }
                 } else {

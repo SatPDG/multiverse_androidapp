@@ -7,15 +7,14 @@ import java.util.function.Supplier;
 import multiverse.androidapp.multiverse.R;
 import multiverse.androidapp.multiverse.database.webDatabase.HttpService;
 import multiverse.androidapp.multiverse.database.webDatabase.WebServiceResponse;
-import multiverse.androidapp.multiverse.model.commonModel.ConversationModel;
-import multiverse.androidapp.multiverse.model.commonModel.MessageModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.ConversationWebModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.MessageWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.ConversationInfoRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.ConversationInfoResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.ConversationListResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.CreateConversationRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.MessageListResponseModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.SendMessageRequestWebModel;
-import multiverse.androidapp.multiverse.model.webModel.conversation.UpdateConversationRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.UpdateMessageRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.IDListRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.ListRequestWebModel;
@@ -53,11 +52,11 @@ public class ConversationWebService {
         }, context);
     }
 
-    public static WebServiceResponse<ConversationModel> createConversation(final CreateConversationRequestWebModel request, final Context context) {
-        return ApiCaller.callApi(new Supplier<ApiResponse<ConversationModel>>() {
+    public static WebServiceResponse<ConversationWebModel> createConversation(final CreateConversationRequestWebModel request, final Context context) {
+        return ApiCaller.callApi(new Supplier<ApiResponse<ConversationWebModel>>() {
             @Override
-            public ApiResponse<ConversationModel> get() {
-                return HttpService.post(context.getString(R.string.network_conversation_new), request, ConversationModel.class, context);
+            public ApiResponse<ConversationWebModel> get() {
+                return HttpService.post(context.getString(R.string.network_conversation_new), request, ConversationWebModel.class, context);
             }
         }, context);
     }
@@ -71,11 +70,11 @@ public class ConversationWebService {
         }, context);
     }
 
-    public static WebServiceResponse<MessageModel> sendMessage(final SendMessageRequestWebModel request, final int conversationID, final Context context) {
-        return ApiCaller.callApi(new Supplier<ApiResponse<MessageModel>>() {
+    public static WebServiceResponse<MessageWebModel> sendMessage(final SendMessageRequestWebModel request, final int conversationID, final Context context) {
+        return ApiCaller.callApi(new Supplier<ApiResponse<MessageWebModel>>() {
             @Override
-            public ApiResponse<MessageModel> get() {
-                return HttpService.post(String.format(context.getString(R.string.network_conversation_sendMessage), conversationID), request, MessageModel.class, context);
+            public ApiResponse<MessageWebModel> get() {
+                return HttpService.post(String.format(context.getString(R.string.network_conversation_sendMessage), conversationID), request, MessageWebModel.class, context);
             }
         }, context);
     }
@@ -98,11 +97,11 @@ public class ConversationWebService {
         }, context);
     }
 
-    public static WebServiceResponse<MessageModel> updateMessage(final UpdateMessageRequestWebModel request, final  int conversationID, final int messageID, final Context context) {
-        return ApiCaller.callApi(new Supplier<ApiResponse<MessageModel>>() {
+    public static WebServiceResponse<MessageWebModel> updateMessage(final UpdateMessageRequestWebModel request, final int conversationID, final int messageID, final Context context) {
+        return ApiCaller.callApi(new Supplier<ApiResponse<MessageWebModel>>() {
             @Override
-            public ApiResponse<MessageModel> get() {
-                return HttpService.post(String.format(context.getString(R.string.network_conversation_updateMessage), conversationID, messageID), request, MessageModel.class, context);
+            public ApiResponse<MessageWebModel> get() {
+                return HttpService.post(String.format(context.getString(R.string.network_conversation_updateMessage), conversationID, messageID), request, MessageWebModel.class, context);
             }
         }, context);
     }

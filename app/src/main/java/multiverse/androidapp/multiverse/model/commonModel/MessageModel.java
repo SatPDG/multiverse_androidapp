@@ -6,41 +6,35 @@ import java.util.Calendar;
 import java.util.Date;
 
 import multiverse.androidapp.multiverse.model.dbModel.MessageDbModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.MessageWebModel;
 
 public class MessageModel {
-
     public int messageID;
     public int conversationID;
     public int authorID;
-    public String publishedTime;
+    public Date publishedTime;
     public byte messageType;
     public String message;
+
+    public MessageWebModel toWebModel() {
+        MessageWebModel webModel = new MessageWebModel();
+        webModel.messageID = messageID;
+        webModel.conversationID = conversationID;
+        webModel.authorID = authorID;
+        webModel.publishedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(publishedTime);
+        webModel.messageType = messageType;
+        webModel.message = message;
+        return webModel;
+    }
 
     public MessageDbModel toDbModel() {
         MessageDbModel dbModel = new MessageDbModel();
         dbModel.messageID = messageID;
         dbModel.conversationID = conversationID;
         dbModel.authorID = authorID;
-        try {
-            dbModel.publishedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(publishedTime).getTime();
-        } catch (ParseException e) {
-            dbModel.publishedTime = Calendar.getInstance().getTime().getTime();
-        }
-        dbModel.messageType = messageType;
+        dbModel.publishedTime = publishedTime.getTime();
+        dbModel.messageType = (int) messageType;
         dbModel.message = message;
-
         return dbModel;
-    }
-
-    public static MessageModel toModel(MessageDbModel dbModel) {
-        MessageModel model = new MessageModel();
-        model.messageID = dbModel.messageID;
-        model.conversationID = dbModel.conversationID;
-        model.authorID = dbModel.authorID;
-        model.publishedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dbModel.publishedTime));
-        model.messageType = (byte) dbModel.messageType;
-        model.message = dbModel.message;
-
-        return model;
     }
 }

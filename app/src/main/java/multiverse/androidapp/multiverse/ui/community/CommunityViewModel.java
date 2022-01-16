@@ -18,6 +18,7 @@ import java.util.Set;
 
 import multiverse.androidapp.multiverse.MultiverseApplication;
 import multiverse.androidapp.multiverse.model.commonModel.UserModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 import multiverse.androidapp.multiverse.repository.RelationshipRepository;
 import multiverse.androidapp.multiverse.repository.UserRepository;
 import multiverse.androidapp.multiverse.repository.callback.RelationshipCallback;

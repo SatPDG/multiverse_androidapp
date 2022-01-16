@@ -3,6 +3,10 @@ package multiverse.androidapp.multiverse.model.dbModel;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import java.util.Date;
+
+import multiverse.androidapp.multiverse.model.commonModel.MessageModel;
+
 public class MessageDbModel {
 
     public static final String TABLE_NAME = "message";
@@ -48,6 +52,17 @@ public class MessageDbModel {
         content.put(LAST_DATA_UPDATE_COLUMN_NAME, lastDataUpdate);
 
         return content;
+    }
+
+    public MessageModel toCommonModel() {
+        MessageModel model = new MessageModel();
+        model.messageID = messageID;
+        model.conversationID = conversationID;
+        model.authorID = authorID;
+        model.publishedTime = new Date(publishedTime);
+        model.messageType = (byte) messageType;
+        model.message = message;
+        return model;
     }
 
     public static MessageDbModel toDbModel(Cursor cursor){

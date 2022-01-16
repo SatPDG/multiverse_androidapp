@@ -1,11 +1,11 @@
 package multiverse.androidapp.multiverse.model.webModel.user;
 
-import multiverse.androidapp.multiverse.model.commonModel.LocationModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.LocationWebModel;
 
 public class UserSearchRequestWebModel {
 
     public String nameSearch;
-    public LocationModel locationSearch;
+    public LocationWebModel locationSearch;
     public int count;
     public int offset;
 }

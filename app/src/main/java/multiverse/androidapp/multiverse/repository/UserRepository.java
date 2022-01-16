@@ -3,6 +3,7 @@ package multiverse.androidapp.multiverse.repository;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -13,6 +14,7 @@ import multiverse.androidapp.multiverse.database.localDatabase.localDatabaseServ
 import multiverse.androidapp.multiverse.database.webDatabase.WebServiceResponse;
 import multiverse.androidapp.multiverse.database.webDatabase.webServices.UserWebService;
 import multiverse.androidapp.multiverse.model.commonModel.UserModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 import multiverse.androidapp.multiverse.model.dbModel.UserDbModel;
 import multiverse.androidapp.multiverse.model.repositoryModel.user.UserInfoRespositoryModel;
 import multiverse.androidapp.multiverse.model.repositoryModel.user.UserOwnInfoRepositoryModel;
@@ -157,23 +159,25 @@ public class UserRepository {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<UserModel> userList = new ArrayList<>();
-
                 // Go fetch some users from the db if we have enough users
                 SQLiteDatabase db = dbHelper.getReadableDatabase();
                 int size = UserLocalDbService.getSize(db);
                 if(size >= 10) {
+                    List<UserModel> userList = new ArrayList<>();
                     List<UserDbModel> usersDbList = UserLocalDbService.getMostRecentUser(db, 10);
                     for(UserDbModel user : usersDbList) {
-                        userList.add(user.toModel());
+                        userList.add(user.toCommonModel());
                     }
                     callback.userListCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, userList, 10, 0, 10);
                 } else {
                     // Fetch users from the api
                     WebServiceResponse<UserListResponseWebModel> webResponse = UserWebService.getUserList(context);
                     if(webResponse.isResponseOK) {
-                        userList.addAll(webResponse.data.users);
-                        callback.userListCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, userList, 10, 0, 10);
+                        List<UserModel> modelList = new ArrayList<>();
+                        for (UserWebModel webModel : webResponse.data.users) {
+                            modelList.add(webModel.toCommonModel());
+                        }
+                        callback.userListCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, modelList, 10, 0, 10);
                     } else {
                         callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, new WebError(webResponse));
                     }
@@ -186,8 +190,6 @@ public class UserRepository {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<UserModel> userList = new ArrayList<>();
-
                 // Call the web for the search
                 UserSearchRequestWebModel request = new UserSearchRequestWebModel();
                 request.locationSearch = null;
@@ -197,8 +199,11 @@ public class UserRepository {
                 WebServiceResponse<UserListResponseWebModel> webResponse = UserWebService.searchForUsers(request, context);
 
                 if(webResponse.isResponseOK) {
-                    userList.addAll(webResponse.data.users);
-                    callback.userListCallback(UserListCallback.UserCallbackType.USER_NAME_SEARCH, userList, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
+                    List<UserModel> modelList = new ArrayList<>();
+                    for (UserWebModel webModel : webResponse.data.users) {
+                        modelList.add(webModel.toCommonModel());
+                    }
+                    callback.userListCallback(UserListCallback.UserCallbackType.USER_NAME_SEARCH, modelList, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
                 } else {
                     callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_NAME_SEARCH, new WebError(webResponse));
                 }
@@ -207,7 +212,7 @@ public class UserRepository {
     }
 
     public void searchForUserByLocation(final int count, final int offset, final UserListCallback callback, final Context context) {
-        // To implement
+        // TODO - to implement
 
     }
 }

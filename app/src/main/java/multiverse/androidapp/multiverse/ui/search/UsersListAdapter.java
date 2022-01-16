@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import multiverse.androidapp.multiverse.R;
 import multiverse.androidapp.multiverse.model.commonModel.UserModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 
 public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.UserViewHolder> {
 
