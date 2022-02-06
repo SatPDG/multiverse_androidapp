@@ -16,6 +16,7 @@ import multiverse.androidapp.multiverse.model.webModel.conversation.CreateConver
 import multiverse.androidapp.multiverse.model.webModel.conversation.MessageListResponseModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.SendMessageRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.UpdateMessageRequestWebModel;
+import multiverse.androidapp.multiverse.model.webModel.user.UserListResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.IDListRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.ListRequestWebModel;
 
@@ -102,6 +103,15 @@ public class ConversationWebService {
             @Override
             public ApiResponse<MessageWebModel> get() {
                 return HttpService.post(String.format(context.getString(R.string.network_conversation_updateMessage), conversationID, messageID), request, MessageWebModel.class, context);
+            }
+        }, context);
+    }
+
+    public static WebServiceResponse<UserListResponseWebModel> getUserFromConversation(final ListRequestWebModel request, final int conversationID, final Context context) {
+        return ApiCaller.callApi(new Supplier<ApiResponse<UserListResponseWebModel>>() {
+            @Override
+            public ApiResponse<UserListResponseWebModel> get() {
+                return HttpService.post(String.format(context.getString(R.string.network_conversation_getUserFromConv), conversationID), request, UserListResponseWebModel.class, context);
             }
         }, context);
     }

@@ -4,9 +4,7 @@ import multiverse.androidapp.multiverse.model.repositoryModel.conversation.Conve
 
 public interface ConversationCallback {
 
-    void conversationInfoCallback(ConversationInfoRespositoryModel convInfo);
-
-    void conversationActionCallback(ConversationCallbackType type);
+    void conversationActionCallback(ConversationCallbackType type, Object param);
 
     void conversationErrorCallback(ConversationCallbackType type, WebError webError);
 

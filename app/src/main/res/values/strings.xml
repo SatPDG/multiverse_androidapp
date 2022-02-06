@@ -27,8 +27,9 @@
     <string name="network_conversation_deleteMessage">/api/conversation/%d/%d</string>
     <string name="network_conversation_updateMessage">/api/conversation/%d/%d</string>
     <string name="network_conversation_messageList">/api/conversation/%d/messages</string>
-    <string name="network_conversation_addUserToConv">/api/conversation/%d/users</string>
+    <string name="network_conversation_addUserToConv">/api/conversation/%d/add</string>
     <string name="network_conversation_deleteUserFromConv">/api/conversation/%d/users</string>
+    <string name="network_conversation_getUserFromConv">/api/conversation/%d/users</string>
     <string name="network_notification_get">/api/notification/notifications</string>
 
     <string name="app_name">Multiverse</string>
@@ -48,8 +49,9 @@
     <string name="general_empty_list">Empty List...</string>
     <string name="general_year">Year</string>
     <string name="general_month">Month</string>
-    <string name="general_day">Day</string>
-    <string name="general_minute">Minute</string>
+    <string name="general_day">Days</string>
+    <string name="general_minute">Minutes</string>
+    <string name="general_user_name">User Name</string>
 
     <!-- Register Strings -->
     <string name="register_repeat_password">Repeat the Password</string>
@@ -95,6 +97,20 @@
     <string name="community_followed">Followed</string>
     <string name="community_follower_request">Follower Request</string>
     <string name="community_followed_request">Followed Request</string>
+
+    <!-- Conversation Message -->
+    <string name="conversation_message_text_hint">Write something...</string>
+
+    <!-- Conversation Settings -->
+    <string name="conversation_settings_conversation_name">Conversation Name </string>
+    <string name="conversation_settings_default_name">Conversation with my friends!!</string>
+    <string name="conversation_settings_users">Conversation Members</string>
+    <string name="conversation_settings_create">Create Conversation</string>
+    <string name="conversation_settings_update">Update Conversation</string>
+    <string name="conversation_settings_user_added">The users were successfully added!</string>
+    <string name="conversation_settings_user_removed">The users were successfully removed!</string>
+    <string name="conversation_settings_conv_updated">The conversation was successfully updated!</string>
+    <string name="conversation_settings_conv_created">The conversation was successfully created!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

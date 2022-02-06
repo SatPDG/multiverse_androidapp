@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,11 +21,13 @@ import multiverse.androidapp.multiverse.database.webDatabase.WebServiceResponse;
 import multiverse.androidapp.multiverse.database.webDatabase.webServices.ConversationWebService;
 import multiverse.androidapp.multiverse.model.commonModel.ConversationModel;
 import multiverse.androidapp.multiverse.model.commonModel.MessageModel;
+import multiverse.androidapp.multiverse.model.commonModel.UserModel;
 import multiverse.androidapp.multiverse.model.webModel.commonModel.ConversationWebModel;
 import multiverse.androidapp.multiverse.model.webModel.commonModel.MessageWebModel;
 import multiverse.androidapp.multiverse.model.dbModel.ConversationDbModel;
 import multiverse.androidapp.multiverse.model.dbModel.MessageDbModel;
 import multiverse.androidapp.multiverse.model.repositoryModel.conversation.ConversationInfoRespositoryModel;
+import multiverse.androidapp.multiverse.model.webModel.commonModel.UserWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.ConversationInfoRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.ConversationInfoResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.ConversationListResponseWebModel;
@@ -32,12 +35,14 @@ import multiverse.androidapp.multiverse.model.webModel.conversation.CreateConver
 import multiverse.androidapp.multiverse.model.webModel.conversation.MessageListResponseModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.SendMessageRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.conversation.UpdateMessageRequestWebModel;
+import multiverse.androidapp.multiverse.model.webModel.user.UserListResponseWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.IDListRequestWebModel;
 import multiverse.androidapp.multiverse.model.webModel.util.ListRequestWebModel;
 import multiverse.androidapp.multiverse.repository.callback.ConversationCallback;
 import multiverse.androidapp.multiverse.repository.callback.ConversationListCallback;
 import multiverse.androidapp.multiverse.repository.callback.MessageCallback;
 import multiverse.androidapp.multiverse.repository.callback.MessageListCallback;
+import multiverse.androidapp.multiverse.repository.callback.UserListCallback;
 import multiverse.androidapp.multiverse.repository.callback.WebError;
 import multiverse.androidapp.multiverse.repository.event.ConversationEvent;
 import multiverse.androidapp.multiverse.repository.event.MessageEvent;
@@ -65,7 +70,7 @@ public class ConversationRepository {
                     model.name = dbModel.name;
                     model.lastUpdate = new Date(dbModel.lastUpdate);
                     model.nbrOfUser = -1;
-                    callback.conversationInfoCallback(model);
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.GET_CONVERSATION_INFO, model);
                 }
 
                 // Fetch the web api
@@ -80,7 +85,7 @@ public class ConversationRepository {
                         model.lastUpdate = Calendar.getInstance().getTime();
                     }
                     model.nbrOfUser = webResponse.data.nbrOfUser;
-                    callback.conversationInfoCallback(model);
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.GET_CONVERSATION_INFO, model);
 
                     // Update the database
                     dbModel = new ConversationDbModel();
@@ -92,6 +97,7 @@ public class ConversationRepository {
                 } else {
                     callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.GET_CONVERSATION_INFO, new WebError(webResponse));
                 }
+                db.close();
             }
         });
     }
@@ -105,7 +111,7 @@ public class ConversationRepository {
 
                 WebServiceResponse<Void> webResponse = ConversationWebService.setConversationInfo(conversationID, webRequest, context);
                 if(webResponse.isResponseOK) {
-                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO);
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, null);
 
                     // Update the conversation in the db if it is present
                     ConversationDbModel dbModel = new ConversationDbModel();
@@ -113,7 +119,9 @@ public class ConversationRepository {
                     dbModel.name = conversationName;
                     dbModel.lastDataUpdate = Calendar.getInstance().getTime().getTime();
                     dbModel.lastUpdate = Calendar.getInstance().getTime().getTime();
-                    ConversationLocalDbService.updateConversation(dbHelper.getWritableDatabase(), dbModel);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    ConversationLocalDbService.updateConversation(db, dbModel);
+                    db.close();
 
                     // Send the event to the bus
                     EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.SET_CONVERSATION_INFO, dbModel.toCommonModel()));
@@ -130,7 +138,7 @@ public class ConversationRepository {
             public void run() {
                 WebServiceResponse<Void> webResponse = ConversationWebService.deleteConversationInfo(conversationID, context);
                 if(webResponse.isResponseOK) {
-                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.DELETE_CONVERSATION);
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.DELETE_CONVERSATION, null);
 
                     // Remove conversation from database if there
                     ConversationLocalDbService.deleteConversation(dbHelper.getWritableDatabase(), conversationID);
@@ -151,18 +159,14 @@ public class ConversationRepository {
                 WebServiceResponse<ConversationWebModel> webResponse = ConversationWebService.createConversation(request, context);
                 if(webResponse.isResponseOK) {
                     // Add conversation to db
-                    ConversationDbModel dbModel = new ConversationDbModel();
-                    dbModel.conversationID = webResponse.data.conversationID;
-                    dbModel.name = webResponse.data.name;
-                    try {
-                        dbModel.lastUpdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(webResponse.data.lastUpdate).getTime();
-                    } catch (ParseException e) {
-                        dbModel.lastUpdate = Calendar.getInstance().getTime().getTime();
-                    }
-                    dbModel.lastDataUpdate = Calendar.getInstance().getTime().getTime();
-                    ConversationLocalDbService.addConversation(dbHelper.getWritableDatabase(), dbModel);
+                    ConversationModel model = webResponse.data.toCommonModel();
+                    ConversationDbModel dbModel = model.toDbModel();
 
-                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.CREATE_CONVERSATION);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    ConversationLocalDbService.addConversation(db, dbModel);
+                    db.close();
+
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.CREATE_CONVERSATION, model);
                 } else {
                     callback.conversationErrorCallback(ConversationCallback.ConversationCallbackType.CREATE_CONVERSATION, new WebError(webResponse));
                 }
@@ -175,7 +179,7 @@ public class ConversationRepository {
             @Override
             public void run() {
                 // Fetch conversation from the local database
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                SQLiteDatabase db = dbHelper.getReadableDatabase();
                 List<ConversationDbModel> dbList = ConversationLocalDbService.getConversations(db, offset, count);
                 if(dbList.size() > 0) {
                     List<ConversationModel> list = new ArrayList<>();
@@ -185,6 +189,7 @@ public class ConversationRepository {
                     int totalSize = ConversationLocalDbService.getSize(db);
                     callback.conversationListCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, list, count, offset, totalSize);
                 }
+                db.close();
 
                 // Fetch the web
                 ListRequestWebModel request = new ListRequestWebModel();
@@ -199,11 +204,34 @@ public class ConversationRepository {
                     callback.conversationListCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, list, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
 
                     // Update the database
+                    db = dbHelper.getWritableDatabase();
                     for (ConversationModel model : list) {
                         ConversationLocalDbService.updateOrAddConversation(db, model.toDbModel());
                     }
+                    db.close();
                 } else {
                     callback.conversationListErrorCallback(ConversationListCallback.ConversationListCallbackType.CONVERSATION_LIST, new WebError(webResponse));
+                }
+            }
+        });
+    }
+
+    public void getUserFromConversation(final int conversationID, final int count, final int offset, final UserListCallback callback, final Context context) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                ListRequestWebModel request = new ListRequestWebModel();
+                request.count = count;
+                request.offset = offset;
+                WebServiceResponse<UserListResponseWebModel> webResponse = ConversationWebService.getUserFromConversation(request, conversationID, context);
+                if (webResponse.isResponseOK) {
+                    List<UserModel> userList = new ArrayList<>();
+                    for (UserWebModel webModel : webResponse.data.users) {
+                        userList.add(webModel.toCommonModel());
+                    }
+                    callback.userListCallback(UserListCallback.UserCallbackType.CONVERSATION_USER_LIST, userList, webResponse.data.count, webResponse.data.offset, webResponse.data.totalSize);
+                } else {
+                    callback.userListErrorCallback(UserListCallback.UserCallbackType.CONVERSATION_USER_LIST, new WebError(webResponse));
                 }
             }
         });
@@ -217,7 +245,7 @@ public class ConversationRepository {
                 request.idList = users;
                 WebServiceResponse<Void> webResponse = ConversationWebService.addUserToConversation(request, conversationID, context);
                 if(webResponse.isResponseOK) {
-                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV);
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV, users);
 
                     // Send event
                     EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.ADD_USER_TO_CONV, users));
@@ -236,7 +264,7 @@ public class ConversationRepository {
                 request.idList = users;
                 WebServiceResponse<Void> webResponse = ConversationWebService.removeUserFromConversation(request, conversationID, context);
                 if(webResponse.isResponseOK) {
-                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV);
+                    callback.conversationActionCallback(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV, users);
 
                     // Send event
                     EventBus.getDefault().post(new ConversationEvent(ConversationCallback.ConversationCallbackType.REMOVE_USER_FROM_CONV, users));
@@ -282,7 +310,9 @@ public class ConversationRepository {
                     MessageModel model = webResponse.data.toCommonModel();
 
                     // Update the message to the database
-                    MessageLocalDbServices.updateMessage(dbHelper.getWritableDatabase(), model.toDbModel());
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    MessageLocalDbServices.updateMessage(db, model.toDbModel());
+                    db.close();
 
                     callback.messageActionCallback(MessageCallback.MessageCallbackType.UPDATE_MESSAGE, model);
 
@@ -302,7 +332,9 @@ public class ConversationRepository {
                 WebServiceResponse<Void> webResponse = ConversationWebService.deleteMessage(conversationID, messageID, context);
                 if(webResponse.isResponseOK) {
                     // Delete the message to the database
-                    MessageLocalDbServices.deleteMessage(dbHelper.getWritableDatabase(), messageID);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    MessageLocalDbServices.deleteMessage(db, messageID);
+                    db.close();
 
                     callback.messageActionCallback(MessageCallback.MessageCallbackType.DELETE_MESSAGE, null);
 
@@ -353,6 +385,7 @@ public class ConversationRepository {
                 } else {
                     callback.messageListErrorCallback(MessageListCallback.MessageListCallbackType.MESSAGE_LIST, new WebError(webResponse));
                 }
+                db.close();
             }
         });
     }

@@ -9,8 +9,6 @@ public interface UserCallback {
 
     void userOwnInfoCallback(UserOwnInfoRepositoryModel userInfo);
 
-    //void userSimpleInfoCallback(UserModel userModel);
-
     void userErrorCallback(WebError webError);
 
 }

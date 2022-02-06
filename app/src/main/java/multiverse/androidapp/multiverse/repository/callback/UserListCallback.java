@@ -11,6 +11,7 @@ public interface UserListCallback {
     void userListErrorCallback(UserCallbackType type, WebError webError);
 
     enum UserCallbackType {
-        USER_LOCATION_SEARCH, USER_NAME_SEARCH, USER_FOLLOWER, USER_FOLLOWED, USER_FOLLOWER_REQ, USER_FOLLOWED_REQ
+        USER_LOCATION_SEARCH, USER_NAME_SEARCH, USER_FOLLOWER, USER_FOLLOWED, USER_FOLLOWER_REQ, USER_FOLLOWED_REQ,
+        CONVERSATION_USER_LIST
     }
 }

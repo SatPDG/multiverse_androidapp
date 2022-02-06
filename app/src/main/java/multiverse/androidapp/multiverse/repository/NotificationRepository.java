@@ -78,6 +78,7 @@ public class NotificationRepository {
                 } else {
                     callback.notificationErrorCallback(NotificationListCallback.NotificationListCallbackType.NOTIFICATION, new WebError(webReponse));
                 }
+                db.close();
             }
         });
     }

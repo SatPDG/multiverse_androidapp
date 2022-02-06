@@ -45,7 +45,7 @@ public class ConversationListViewModel extends AndroidViewModel implements Conve
                 ((MultiverseApplication) getApplication()).dbHelper);
 
         conversationList = new ArrayList<>();
-        totalSize = new MutableLiveData<>(0);
+        totalSize = new MutableLiveData<>(Integer.MAX_VALUE);
         loadedSize = new MutableLiveData<>(0);
         lastWebError = new MutableLiveData<>(null);
 
@@ -57,6 +57,7 @@ public class ConversationListViewModel extends AndroidViewModel implements Conve
         int page = getPage(position);
         if (!loadingPage.contains(page)) {
             // Load the page
+            loadingPage.add(page);
             conversationRepository.getConversationList(PAGE_SIZE, page * PAGE_SIZE, this, getApplication().getApplicationContext());
         }
     }

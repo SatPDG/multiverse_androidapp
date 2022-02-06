@@ -85,6 +85,7 @@ public class UserRepository {
                     WebError webError = new WebError(webResponse);
                     callback.userErrorCallback(webError);
                 }
+                db.close();
             }
         });
     }
@@ -151,6 +152,7 @@ public class UserRepository {
                     WebError webError = new WebError(webResponse);
                     callback.userErrorCallback(webError);
                 }
+                db.close();
             }
         });
     }
@@ -182,6 +184,7 @@ public class UserRepository {
                         callback.userListErrorCallback(UserListCallback.UserCallbackType.USER_LOCATION_SEARCH, new WebError(webResponse));
                     }
                 }
+                db.close();
             }
         });
     }
